@@ -32,10 +32,35 @@ pipeline {
             }
         }
 
-        stage('Success') {
-           steps {
-                echo 'Build Completed Successfully!'
+        stage('Check Docker') {
+            steps {
+                bat 'docker --version'
+                bat 'docker compose version'
+                bat 'docker ps'
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                bat 'docker compose down'
+                bat 'docker compose up --build -d'
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                bat 'docker ps'
+            }
+        }
     }
-}
+
+    post {
+        success {
+            echo 'Application deployed successfully.'
+        }
+
+        failure {
+            echo 'Pipeline failed.'
+        }
     }
 }
