@@ -32,10 +32,11 @@ pipeline {
             }
         }
 
-        stage('Success') {
-            steps {
-                echo 'Build Completed Successfully!'
-            }
-        }
+       stage('Deploy') {
+    steps {
+        bat 'docker compose down'
+        bat 'docker compose up --build -d'
+    }
+}
     }
 }
