@@ -15,10 +15,17 @@ pipeline {
             }
         }
 
+        stage('Show Workspace') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    bat 'mvn clean package'
+                    sh 'mvn clean package'
                 }
             }
         }
@@ -26,30 +33,32 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('my-app') {
-                    bat 'npm install'
-                    bat 'npm run build'
+                    sh 'npm install'
+                    sh 'npm run build'
                 }
             }
         }
 
         stage('Check Docker') {
             steps {
-                bat 'docker --version'
-                bat 'docker compose version'
-                bat 'docker ps'
+                sh 'docker --version'
+                sh 'docker compose version'
+                sh 'docker ps'
             }
         }
 
         stage('Deploy Application') {
             steps {
-                bat 'docker compose down'
-                bat 'docker compose up --build -d'
+                sh '''
+                    docker compose down || true
+                    docker compose up --build -d
+                '''
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                bat 'docker ps'
+                sh 'docker ps'
             }
         }
     }
