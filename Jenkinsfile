@@ -3,73 +3,52 @@ pipeline {
 
     tools {
         jdk 'JDK21'
-        maven 'Maven3'
+    }
+
+    environment {
+        APP_SERVER = "ubuntu@<APPLICATION_SERVER_PUBLIC_IP>"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Source') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/deepakS-009/student_management.git'
             }
         }
 
-        stage('Show Workspace') {
+        stage('Deploy to Application Server') {
             steps {
-                sh 'pwd'
-                sh 'ls -la'
-            }
-        }
-
-        stage('Build Backend') {
-            steps {
-                dir('backend') {
-                    sh 'mvn clean package'
-                }
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                dir('my-app') {
-                    sh 'npm install'
-                    sh 'npm run build'
-                }
-            }
-        }
-
-        stage('Check Docker') {
-            steps {
-                sh 'docker --version'
-                sh 'docker compose version'
-                sh 'docker ps'
-            }
-        }
-
-        stage('Deploy Application') {
-            steps {
-                sh '''
-                    docker compose down || true
+                sh """
+                ssh -o StrictHostKeyChecking=no \$APP_SERVER '
+                    cd ~/student_management &&
+                    git pull origin main &&
+                    docker compose down &&
                     docker compose up --build -d
-                '''
+                '
+                """
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'docker ps'
+                sh """
+                ssh -o StrictHostKeyChecking=no \$APP_SERVER '
+                    docker ps
+                '
+                """
             }
         }
     }
 
     post {
         success {
-            echo 'Application deployed successfully.'
+            echo 'Application deployed successfully!'
         }
 
         failure {
-            echo 'Pipeline failed.'
+            echo 'Deployment failed!'
         }
     }
 }
