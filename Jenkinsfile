@@ -1,9 +1,7 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JDK21'
-    }
+
 
     environment {
         APP_SERVER = "ubuntu@<APPLICATION_SERVER_PUBLIC_IP>"
