@@ -18,7 +18,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                   bat 'mvn clean package -DskipTests'
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
@@ -29,6 +29,13 @@ pipeline {
                     bat 'npm install'
                     bat 'npm run build'
                 }
+            }
+        }
+
+        stage('Deploy Docker') {
+            steps {
+                bat 'docker compose down'
+                bat 'docker compose up --build -d'
             }
         }
 
