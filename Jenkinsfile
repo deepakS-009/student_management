@@ -1,52 +1,40 @@
 pipeline {
     agent any
 
-
-
-    environment {
-        APP_SERVER = "ubuntu@<APPLICATION_SERVER_PUBLIC_IP>"
+    tools {
+        jdk 'JDK21'
+        maven 'Maven3'
     }
 
     stages {
 
-        stage('Checkout Source') {
+        stage('Checkout') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/deepakS-009/student_management.git'
             }
         }
 
-        stage('Deploy to Application Server') {
+        stage('Build Backend') {
             steps {
-                sh """
-                ssh -o StrictHostKeyChecking=no \$APP_SERVER '
-                    cd ~/student_management &&
-                    git pull origin main &&
-                    docker compose down &&
-                    docker compose up --build -d
-                '
-                """
+                dir('backend') {
+                    bat 'mvn clean package'
+                }
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Build Frontend') {
             steps {
-                sh """
-                ssh -o StrictHostKeyChecking=no \$APP_SERVER '
-                    docker ps
-                '
-                """
+                dir('my-app') {
+                    bat 'npm install'
+                    bat 'npm run build'
+                }
             }
         }
-    }
 
-    post {
-        success {
-            echo 'Application deployed successfully!'
-        }
-
-        failure {
-            echo 'Deployment failed!'
-        }
+        stage('Success') {
+           steps {
+                echo 'Build Completed Successfully!'
     }
 }
+    }
