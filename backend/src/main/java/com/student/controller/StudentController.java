@@ -10,7 +10,7 @@ import com.student.service.StudentService;
 
 @RestController
 @RequestMapping("/students")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174")
 public class StudentController {
 
     @Autowired
