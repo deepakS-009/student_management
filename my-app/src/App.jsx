@@ -73,7 +73,7 @@ function App() {
       <div className="max-w-5xl mx-auto">
 
         <h1 className="text-5xl font-bold text-center text-blue-600 mb-10">
-          Student Management System
+          Student Management Systems
         </h1>
 
         <StudentForm
