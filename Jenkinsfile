@@ -32,17 +32,36 @@ pipeline {
             }
         }
 
-        stage('Deploy Docker') {
+        stage('Stop Existing Containers') {
             steps {
                 bat 'docker compose down'
+            }
+        }
+
+        stage('Deploy Docker') {
+            steps {
                 bat 'docker compose up --build -d'
             }
         }
 
-        stage('Success') {
+        stage('Verify Deployment') {
             steps {
-                echo 'Build Completed Successfully!'
+                bat 'docker ps'
             }
+        }
+    }
+
+    post {
+        success {
+            echo '==================================='
+            echo 'Deployment Successful'
+            echo '==================================='
+        }
+
+        failure {
+            echo '==================================='
+            echo 'Deployment Failed'
+            echo '==================================='
         }
     }
 }
